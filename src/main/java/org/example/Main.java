@@ -40,7 +40,7 @@ public class Main {
                                 "Content-Type: " + mimeType + "\r\n" +
                                 "Content-Length: " + length + "\r\n" +
                                 "Connection: keep-alive\r\n" +
-                                "\r\n"+
+                                "\r\n" +
                                 "<h1> Hello </h1>"
                 ).getBytes());
                 Files.copy(filePath, responseStream);

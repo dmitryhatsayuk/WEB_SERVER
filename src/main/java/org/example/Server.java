@@ -123,7 +123,7 @@ public class Server {
 //добавляем новую реализацию с хэндлером
                 else if (handlerMap.containsKey(request.meth + request.path)) {
                     logger.log("Handler found!");
-                    handlerMap.get(request.meth + request.body).handle(request,out);
+                    handlerMap.get(request.meth + request.body).handle(request, out);
                 }
             }
         }

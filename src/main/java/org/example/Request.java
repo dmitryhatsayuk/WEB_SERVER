@@ -11,7 +11,7 @@ public class Request {
     protected final String meth;
     protected final String path;
     protected final String headers;
-    protected   final String body;
+    protected final String body;
 
     //для тестов метод toString для класса переопределен
     @Override
