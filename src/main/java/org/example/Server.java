@@ -15,9 +15,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Server {
-    final List<String> validPaths = List.of("/index.html", "/spring.svg", "/spring.png", "/resources.html", "/styles.css", "/app.js", "/links.html", "/forms.html", "/classic.html", "/events.html", "/events.js");
-    ExecutorService threadPool = Executors.newFixedThreadPool(64);
-    ConcurrentHashMap<String, Handler> handlerMap = new ConcurrentHashMap<>();
+    private final List<String> validPaths = List.of("/index.html", "/spring.svg", "/spring.png", "/resources.html", "/styles.css", "/app.js", "/links.html", "/forms.html", "/classic.html", "/events.html", "/events.js");
+    private final ExecutorService threadPool = Executors.newFixedThreadPool(64);
+    private final ConcurrentHashMap<String, Handler> handlerMap = new ConcurrentHashMap<>();
     Logger logger = new Logger();
 
     public void listen(int port) {
@@ -102,7 +102,7 @@ public class Server {
                     ).getBytes());
                     out.write(content);
                     out.flush();
-                    logger.log("classic recieved");
+                    logger.log("classic received");
                     continue;
                 }
 
@@ -114,8 +114,6 @@ public class Server {
                                     "Content-Type: " + mimeType + "\r\n" +
                                     "Content-Length: " + length + "\r\n" +
                                     "Connection: keep-alive\r\n" +
-                                    //добавил keep alive, но соединение все равно рвется
-                                    // пока не понял почему
                                     "\r\n"
                     ).getBytes());
                     Files.copy(filePath, out);
@@ -125,7 +123,7 @@ public class Server {
 //добавляем новую реализацию с хэндлером
                 else if (handlerMap.containsKey(request.meth + request.path)) {
                     logger.log("Handler found!");
-                    handlerMap.get(request.meth + request.body).handle(request, out);
+                    handlerMap.get(request.meth + request.body).handle(request,out);
                 }
             }
         }

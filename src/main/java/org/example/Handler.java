@@ -1,8 +1,8 @@
 package org.example;
 
 import java.io.BufferedOutputStream;
+import java.io.IOException;
 
 public interface Handler {
-    default void handle(Request request, BufferedOutputStream outputStream) {
-    }
+    void handle(Request request, BufferedOutputStream out) throws IOException;
 }

@@ -8,10 +8,10 @@ public class Request {
         this.body = body;
     }
 
-    String meth;
-    String path;
-    String headers;
-    String body;
+    protected final String meth;
+    protected final String path;
+    protected final String headers;
+    protected   final String body;
 
     //для тестов метод toString для класса переопределен
     @Override
