@@ -16,12 +16,59 @@ import java.util.concurrent.Executors;
  * Класс-сервер для обработки http запросов и ответа на них
  */
 public class Server {
-    private final ExecutorService threadPool = Executors.newFixedThreadPool(64);
-    private final ConcurrentHashMap<String, Handler> handlerMap = new ConcurrentHashMap<>();
     public static final String GET = "GET";
     public static final String POST = "POST";
-    final List<String> allowedMethods = List.of(GET, POST);
     static Logger logger = new Logger();
+    final List<String> allowedMethods = List.of(GET, POST);
+    private final ExecutorService threadPool = Executors.newFixedThreadPool(64);
+    private final ConcurrentHashMap<String, Handler> handlerMap = new ConcurrentHashMap<>();
+
+    /**
+     * <p>Метод вычитывающий конкретный заголовок запроса</p>
+     * Метод принимает List с заголовками и искомый заголовок и возвращает его значение
+     *
+     * @param headers List с заголовками запроса
+     * @param header  Искомый заголовок
+     * @return Optional <String>
+     */
+    private static Optional<String> extractHeader(List<String> headers, String header) {
+        return headers.stream().filter(o -> o.startsWith(header)).map(o -> o.substring(o.indexOf(" "))).map(String::trim).findFirst();
+    }
+
+    /**
+     * <p>Метод направляющий Bad Request на не корректные запросы</p>
+     *
+     * @param out Исходящий поток для отправки Response
+     */
+    private static void badRequest(BufferedOutputStream out) throws IOException {
+        out.write(("HTTP/1.1 400 Bad Request\r\n" + "Content-Length: 0\r\n" + "Connection: keep-alive\r\n" + "\r\n").getBytes());
+        out.flush();
+        logger.log("Bad request sent");
+    }
+
+    /**
+     * <p>Метод поиска вхождения массива байт в другой массив</p>
+     * Метод взят из Google Guava с модификациями. Производится поиск искомого массива
+     * на определённом участке байт исходного массива
+     *
+     * @param array  исходный массив байт
+     * @param target искомый массив байт
+     * @param start  указание начала места поиска в исходном массиве
+     * @param max    указание конца места поиска в исходном массиве
+     * @return int
+     */
+    private static int indexOf(byte[] array, byte[] target, int start, int max) {
+        outer:
+        for (int i = start; i < max - target.length + 1; i++) {
+            for (int j = 0; j < target.length; j++) {
+                if (array[i + j] != target[j]) {
+                    continue outer;
+                }
+            }
+            return i;
+        }
+        return -1;
+    }
 
     /**
      * <p>Метод для запуска экземпляра Server</p>
@@ -135,10 +182,11 @@ public class Server {
                     }
                 }
                 logger.log("BODY: " + body);
-                Request request = new Request(method, path, headers.toString(), body, queryString);
-                //Здесь я проверял через Postman что параметры из queryString читаются верно
-                //System.out.println("VALUE OF TEST PARAM=" + request.getQueryParam("TEST"));
 
+                Request request = new Request(method, path, headers.toString(), body, queryString);
+                //Здесь я проверял через Postman, что параметры из queryString и Body читаются верно
+                //System.out.println("VALUE OF TEST PARAM=" + request.getQueryParam("TEST"));
+                //System.out.println(">>>>>>>>>"+ request.getPostParam("TEST"));
                 //для начала ищем в хэндлерах подходящий обработчик, если нашли-хэндлим и идем на новый круг,
                 // если нет-то просто 200-ОК
                 if (handlerMap.containsKey(request.meth + request.path)) {
@@ -168,53 +216,6 @@ public class Server {
 
         handlerMap.put(met + path, handler);
         logger.log("Handler successfully added");
-    }
-
-    /**
-     * <p>Метод вычитывающий конкретный заголовок запроса</p>
-     * Метод принимает List с заголовками и искомый заголовок и возвращает его значение
-     *
-     * @param headers List с заголовками запроса
-     * @param header  Искомый заголовок
-     * @return Возвращает строку со значением заголовка из списка заголовков
-     */
-    private static Optional<String> extractHeader(List<String> headers, String header) {
-        return headers.stream().filter(o -> o.startsWith(header)).map(o -> o.substring(o.indexOf(" "))).map(String::trim).findFirst();
-    }
-
-    /**
-     * <p>Метод направляющий Bad Request на не корректные запросы</p>
-     *
-     * @param out Исходящий поток для отправки Response
-     */
-    private static void badRequest(BufferedOutputStream out) throws IOException {
-        out.write(("HTTP/1.1 400 Bad Request\r\n" + "Content-Length: 0\r\n" + "Connection: keep-alive\r\n" + "\r\n").getBytes());
-        out.flush();
-        logger.log("Bad request sent");
-    }
-
-    /**
-     * <p>Метод поиска вхождения массива байт в другой массив</p>
-     * Метод взят из Google Guava с модификациями. Производится поиск искомого массива
-     * на определённом участке байт исходного массива
-     *
-     * @param array  исходный массив байт
-     * @param target искомый массив байт
-     * @param start  указание начала места поиска в исходном массиве
-     * @param max    указание конца места поиска в исходном массиве
-     * @return Возвращает индекс в массиве байт начала вхождения
-     */
-    private static int indexOf(byte[] array, byte[] target, int start, int max) {
-        outer:
-        for (int i = start; i < max - target.length + 1; i++) {
-            for (int j = 0; j < target.length; j++) {
-                if (array[i + j] != target[j]) {
-                    continue outer;
-                }
-            }
-            return i;
-        }
-        return -1;
     }
 
 }
