@@ -17,13 +17,7 @@ public class Main {
                 final var filePath = Path.of(".", "public", request.path);
                 final var mimeType = Files.probeContentType(filePath);
                 final var length = Files.size(filePath);
-                responseStream.write((
-                        "HTTP/1.1 200 OK\r\n" +
-                                "Content-Type: " + mimeType + "\r\n" +
-                                "Content-Length: " + length + "\r\n" +
-                                "Connection: keep-alive\r\n" +
-                                "\r\n"
-                ).getBytes());
+                responseStream.write(("HTTP/1.1 200 OK\r\n" + "Content-Type: " + mimeType + "\r\n" + "Content-Length: " + length + "\r\n" + "Connection: keep-alive\r\n" + "\r\n").getBytes());
                 Files.copy(filePath, responseStream);
                 responseStream.flush();
                 logger.log(request.path + " OK");
@@ -35,19 +29,12 @@ public class Main {
                 final var mimeType = Files.probeContentType(filePath);
                 final var length = Files.size(filePath);
                 //насколько я понял без Query String метод POST должен просто вернуть страницу
-                responseStream.write((
-                        "HTTP/1.1 200 OK\r\n" +
-                                "Content-Type: " + mimeType + "\r\n" +
-                                "Content-Length: " + length + "\r\n" +
-                                "Connection: keep-alive\r\n" +
-                                "\r\n" +
-                                "<h1> Hello </h1>"
-                ).getBytes());
+                responseStream.write(("HTTP/1.1 200 OK\r\n" + "Content-Type: " + mimeType + "\r\n" + "Content-Length: " + length + "\r\n" + "Connection: keep-alive\r\n" + "\r\n" + "<h1> Hello </h1>").getBytes());
                 Files.copy(filePath, responseStream);
                 responseStream.flush();
                 logger.log(request.path + " OK");
             }
         });
-        server.listen(779);
+        server.listen(719);
     }
 }
