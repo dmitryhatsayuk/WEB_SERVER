@@ -181,12 +181,14 @@ public class Server {
                         body = new String(bodyBytes);
                     }
                 }
-                logger.log("BODY: " + body);
+                //logger.log("BODY: " + body);
 
                 Request request = new Request(method, path, headers.toString(), body, queryString);
+
                 //Здесь я проверял через Postman, что параметры из queryString и Body читаются верно
                 //System.out.println("VALUE OF TEST PARAM=" + request.getQueryParam("TEST"));
                 //System.out.println(">>>>>>>>>"+ request.getPostParam("TEST"));
+
                 //для начала ищем в хэндлерах подходящий обработчик, если нашли-хэндлим и идем на новый круг,
                 // если нет-то просто 200-ОК
                 if (handlerMap.containsKey(request.meth + request.path)) {
@@ -199,6 +201,8 @@ public class Server {
             }
 
             //конец цикла
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
     }

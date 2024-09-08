@@ -95,4 +95,32 @@ public class Request {
         } else return null;
     }
 
+    /**
+     * <p>Метод возвращающий параметры Body в виде Map</p>
+     * <p>
+     * Метод возвращающий содержимое Body в виде Map для всех запросов кроме GET
+     * в случае если Body представлено в виде multipart/form-data
+     *
+     * @return Map<String, String>
+     */
+    public Map<String, String> getParts() throws Exception {
+        if (!meth.equals("GET") && headers.contains("multipart/form-data")) {
+            return new MultiPartStringParser(body).getParameters();
+        } else return null;
+    }
+
+    /**
+     * <p>Метод возвращающий значение параметра Body в виде String</p>
+     * <p>
+     * Метод возвращающий значение параметра Body в формате String для всех запросов кроме GET
+     * в случае если Body представлено в виде multipart/form-data
+     *
+     * @return String
+     */
+    public String getPart(String name) throws Exception {
+        if (!meth.equals("GET") && headers.contains("multipart/form-data")) {
+            return new MultiPartStringParser(body).getParameters().get(name);
+        } else return null;
+
+    }
 }
